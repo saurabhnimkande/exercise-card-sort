@@ -4,6 +4,17 @@ type CardTransactionMapping = {
   [cardId: string]: Transaction
 }
 
+interface ObjectMapping {
+  [index: string]: [
+    {
+      amount: number
+      cardId: string
+      id: string
+      type: string
+    }
+  ]
+}
+
 /**
  * Write a function that receives a large batch of card events from multiple cards,
  * returning an object which maps from cardId -> valid transaction. Only cardIds with
@@ -20,8 +31,37 @@ type CardTransactionMapping = {
  * @returns CardTransactionMapping Valid transactions grouped by cardId
  */
 export const processCardEvents = (cardEvents: CardEvent[]): CardTransactionMapping => {
-
   // logic
+  let obj: ObjectMapping = {}
 
-  return {} as CardTransactionMapping
+  for (let i = 0; i < cardEvents.length; i++) {
+    let val = cardEvents[i]
+    if (val.type === 'RESERVATION') {
+      if (obj[val.cardId] === undefined) {
+        obj[val.cardId] = [val]
+      }
+    } else if (val.type === 'CONFIRMATION') {
+      if (obj[val.cardId] !== undefined) {
+        let tranArr = obj[val.cardId]
+        if (tranArr.length == 1 && tranArr[0].amount === cardEvents[i].amount) {
+          tranArr.push(val)
+        }
+      }
+    } else if (val.type === 'CANCELLATION') {
+      if (obj[val.cardId] !== undefined) {
+        let tranArr = obj[val.cardId]
+        if (tranArr.length == 1 && tranArr[0].amount === cardEvents[i].amount) {
+          tranArr.push(val)
+        }
+      }
+    }
+  }
+
+  for (let keys in obj) {
+    if (obj[keys].length < 2) {
+      delete obj[keys]
+    }
+  }
+
+  return obj as CardTransactionMapping
 }

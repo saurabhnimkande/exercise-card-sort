@@ -13,7 +13,6 @@ export const incompleteCardEvents: CardEvent[] = [
     id: 'd28c2b4a-17f6-4f95-b9df-5f68b452aaac',
     type: 'RESERVATION',
   },
-
   {
     amount: 9999,
     cardId: 'CHARLIE', // starting event
